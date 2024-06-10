@@ -1,11 +1,16 @@
 #!/bin/bash
 
-# Patch for checking
-path_to_check="/data"
-archivelog_directory="/data/pg/14/test1/archivelog"
+# $1 - path for cleaning, ex "/data/pg/14/jira/archivelog/"
+# $2 - treshold, ex 10
 
-# treshold percent for check
-threshold=10
+path_to_check="/data" # Path for checking
+archivelog_directory=$1
+threshold=$2 # treshold percent for check
+
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <path_tor_cleaning> <threshold>"
+    exit 1
+fi
 
 # Checking % free space
 check_disk_usage() {
@@ -16,9 +21,8 @@ check_disk_usage() {
 
 # Clearing space for archvielog_directory
 clear_directory() {
-    local dir="$1"
-    if [ -d "$dir" ]; then
-        find "$dir" -mindepth 1 -delete
+    if [ -d "$archivelog_directory" ]; then
+        find "$archivelog_directory" -mindepth 1 -delete
     fi
 }
 
@@ -28,7 +32,7 @@ echo "Free space: ${free_space_percentage}%"
 
 if [ "$free_space_percentage" -lt "$threshold" ]; then
     echo "Free space is below ${threshold}%, clearing directory: ${archivelog_directory}"
-    clear_directory "$archivelog_directory"
+    clear_directory
 else
     echo "Free space is sufficient."
 fi
